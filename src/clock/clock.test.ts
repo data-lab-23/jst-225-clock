@@ -7,7 +7,7 @@ describe("formatClock", () => {
     expect(formatClock(new Date(2026, 6, 26, 4, 5, 9), "ja-JP")).toEqual({
       time: "04:05",
       date: "2026.07.26",
-      weekday: "譌･譖懈律 / Sunday",
+      weekday: "日曜日 / Sunday",
       seconds: "09",
     });
   });
@@ -21,7 +21,7 @@ describe("formatClock", () => {
 
   it("uses the date weekday instead of a hard-coded Sunday", () => {
     expect(formatClock(new Date(2026, 6, 27, 12, 0, 0))).toMatchObject({
-      weekday: "譛域律 / Monday",
+      weekday: "月曜日 / Monday",
     });
   });
 });
