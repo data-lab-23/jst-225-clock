@@ -15,6 +15,10 @@ describe("resolveTimeZone", () => {
     });
   });
 
+  it("uses JST for Tokyo even when the locale supplies a UTC offset", () => {
+    expect(resolveTimeZone(winterDate, "Asia/Tokyo", "fr-FR").abbreviation).toBe("JST");
+  });
+
   it("presents non-Tokyo zones as local time and preserves their winter abbreviation", () => {
     expect(resolveTimeZone(winterDate, "America/New_York", "en-US")).toMatchObject({
       id: "America/New_York",

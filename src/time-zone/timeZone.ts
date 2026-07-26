@@ -38,7 +38,7 @@ export function resolveTimeZone(
     if (id === "Asia/Tokyo") {
       return {
         id,
-        abbreviation: abbreviation === "GMT+9" ? "JST" : abbreviation,
+        abbreviation: "JST",
         titleJa: "日本標準時",
         titleEn: "Japan Standard Time 225",
       };
