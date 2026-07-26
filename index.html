@@ -6,7 +6,49 @@
     <title>JST 225 Clock</title>
   </head>
   <body>
-    <main id="app" aria-busy="true">譎りｨ医ｒ隱ｭ縺ｿ霎ｼ繧薙〒縺・∪縺・</main>
+    <main id="app">
+      <section class="clock-board" aria-labelledby="clock-title-ja">
+        <header class="clock-header">
+          <div class="clock-title-group">
+            <p class="clock-title-ja" data-clock-field="title-ja" id="clock-title-ja">日本標準時</p>
+            <h1 class="clock-title-en" data-clock-field="title-en">Japan Standard Time 225</h1>
+          </div>
+          <button id="settings-trigger" type="button" aria-label="表示設定を開く">設定</button>
+        </header>
+
+        <div class="clock-panel">
+          <section class="primary-time" aria-labelledby="time-label">
+            <p class="field-label" id="time-label"><span lang="ja">現在時刻</span><span lang="en">Current Time</span></p>
+            <output class="primary-value" data-clock-field="time">--:--</output>
+          </section>
+
+          <dl class="clock-rows">
+            <div class="clock-row date-row">
+              <dt class="field-label"><span lang="ja">日付</span><span lang="en">Date</span></dt>
+              <dd><output data-clock-field="date">----</output></dd>
+            </div>
+            <div class="clock-row">
+              <dt class="field-label"><span lang="ja">曜日</span><span lang="en">Day</span></dt>
+              <dd><output data-clock-field="weekday">----</output></dd>
+            </div>
+            <div class="clock-row">
+              <dt class="field-label"><span lang="ja">秒</span><span lang="en">Seconds</span></dt>
+              <dd><output data-clock-field="seconds">--</output></dd>
+            </div>
+            <div class="clock-row">
+              <dt class="field-label"><span lang="ja">時間帯</span><span lang="en">Time Zone</span></dt>
+              <dd><output data-clock-field="zone">Asia/Tokyo（JST）</output></dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <p class="sr-only" role="status" aria-live="polite"></p>
+
+      <dialog id="settings-dialog" aria-labelledby="settings-dialog-title">
+        <h2 id="settings-dialog-title">表示設定</h2>
+      </dialog>
+    </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
