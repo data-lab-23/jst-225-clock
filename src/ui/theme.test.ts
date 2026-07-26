@@ -27,7 +27,7 @@ describe("applyTheme", () => {
     expect(contrastRatio(DEFAULT_SETTINGS.textColor, DEFAULT_SETTINGS.accentColor)).toBeGreaterThanOrEqual(3);
   });
 
-  it("falls back to the default text colour for a display combination below 3:1", () => {
+  it("chooses white when it has the strongest minimum contrast across dark display backgrounds", () => {
     const root = document.createElement("main");
 
     applyTheme(root, {
@@ -37,7 +37,22 @@ describe("applyTheme", () => {
       textColor: "#222222",
     });
 
-    expect(root.style.getPropertyValue("--text-color")).toBe(DEFAULT_SETTINGS.textColor);
+    expect(root.style.getPropertyValue("--text-color")).toBe("#ffffff");
+  });
+
+  it("chooses black for light display backgrounds when the selected text fails 3:1", () => {
+    const root = document.createElement("main");
+
+    applyTheme(root, {
+      ...DEFAULT_SETTINGS,
+      panelColor: "#ffffff",
+      accentColor: "#eeeeee",
+      textColor: "#f7ffff",
+    });
+
+    expect(root.style.getPropertyValue("--text-color")).toBe("#000000");
+    expect(contrastRatio("#000000", "#ffffff")).toBeGreaterThanOrEqual(3);
+    expect(contrastRatio("#000000", "#eeeeee")).toBeGreaterThanOrEqual(3);
   });
 });
 

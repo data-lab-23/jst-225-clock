@@ -34,7 +34,16 @@ function displayTextColor(settings: ClockSettings): string {
   const isReadableOnPanel = hasMinimumContrast(settings.textColor, settings.panelColor, LARGE_TEXT_MINIMUM_CONTRAST);
   const isReadableOnAccent = hasMinimumContrast(settings.textColor, settings.accentColor, LARGE_TEXT_MINIMUM_CONTRAST);
 
-  return isReadableOnPanel && isReadableOnAccent ? settings.textColor : DEFAULT_SETTINGS.textColor;
+  if (isReadableOnPanel && isReadableOnAccent) return settings.textColor;
+
+  const minimumContrast = (textColor: string) => Math.min(
+    contrastRatio(textColor, settings.panelColor),
+    contrastRatio(textColor, settings.accentColor),
+  );
+  const blackContrast = minimumContrast("#000000");
+  const whiteContrast = minimumContrast("#ffffff");
+
+  return blackContrast > whiteContrast ? "#000000" : "#ffffff";
 }
 
 export function applyTheme(root: HTMLElement, settings: ClockSettings): void {
