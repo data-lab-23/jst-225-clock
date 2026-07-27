@@ -175,9 +175,100 @@ button:focus-visible { outline: 3px solid #f7ffff; outline-offset: 3px; }
 
 dialog { color: #07101f; }
 
+.settings-dialog {
+  inline-size: min(calc(100% - 2rem), 34rem);
+  max-block-size: calc(100dvh - 2rem);
+  margin: auto;
+  overflow: auto;
+  border: 0;
+  border-radius: 1rem;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  color: #07101f;
+  background: #f7ffff;
+  box-shadow: 0 1.25rem 4rem rgb(0 0 0 / 48%);
+}
+
+.settings-dialog:not([open]):not([hidden]) { display: block; }
+.settings-dialog::backdrop { background: rgb(0 8 24 / 72%); }
+
+.settings-dialog h2,
+.settings-dialog__description { margin: 0; }
+
+.settings-dialog h2 {
+  font-size: 1.35rem;
+  line-height: 1.3;
+}
+
+.settings-dialog__description {
+  margin-top: 0.5rem;
+  color: #243b53;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.settings-dialog__fields {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.settings-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.settings-field label {
+  font-size: 1rem;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.settings-field input {
+  inline-size: 100%;
+  min-block-size: 2.75rem;
+  accent-color: #075bdb;
+}
+
+.settings-field input[type="color"] {
+  border: 1px solid #5c7288;
+  border-radius: 0.5rem;
+  padding: 0.2rem;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.settings-dialog__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+.settings-dialog__actions button {
+  min-block-size: 2.75rem;
+  border: 1px solid #075bdb;
+  border-radius: 0.55rem;
+  padding: 0.55rem 0.8rem;
+  color: #07101f;
+  background: #e5efff;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.settings-dialog__actions #settings-close {
+  color: #ffffff;
+  background: #075bdb;
+}
+
+.settings-dialog :is(button, input):focus-visible {
+  outline: 3px solid #07101f;
+  outline-offset: 3px;
+}
+
 @media (max-width: 760px) {
   .clock-row { grid-template-columns: 1fr; gap: 0.45rem; }
   .clock-row dd { text-align: left; }
+  .settings-dialog__actions { grid-template-columns: 1fr; }
 }
 
 @media (min-width: 761px) and (max-height: 820px) {
