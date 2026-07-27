@@ -231,27 +231,60 @@ describe("createApp", () => {
     app.cleanup();
   });
 
-  it("renders immediately from fresh time and zone data when the document becomes visible", () => {
+  it("re-detects the zone and renders fresh time when the document becomes visible on the same date", () => {
     let visible = false;
+    let zoneResolutions = 0;
     Object.defineProperty(document, "visibilityState", {
       configurable: true,
       get: () => visible ? "visible" : "hidden",
     });
     const app = setup({
-      resolveZone: (date) => date.getDate() === 27 ? OSAKA_ZONE : TOKYO_ZONE,
+      resolveZone: () => {
+        zoneResolutions += 1;
+        return zoneResolutions === 1 ? TOKYO_ZONE : OSAKA_ZONE;
+      },
     });
 
-    app.setNow(new Date(2026, 6, 27, 8, 10, 11));
+    app.setNow(new Date(2026, 6, 26, 18, 10, 11));
     visible = true;
     document.dispatchEvent(new Event("visibilitychange"));
 
-    expect(field(app.root, "time").textContent).toBe("08:10");
-    expect(field(app.root, "date").textContent).toBe("2026.07.27");
-    expect(field(app.root, "weekday").textContent).toBe("月曜日 / Monday");
+    expect(field(app.root, "time").textContent).toBe("18:10");
+    expect(field(app.root, "date").textContent).toBe("2026.07.26");
+    expect(field(app.root, "weekday").textContent).toBe("日曜日 / Sunday");
     expect(field(app.root, "seconds").textContent).toBe("11");
     expect(field(app.root, "zone").textContent).toContain("Asia/Osaka");
+    expect(field(app.root, "title-ja").textContent).toBe("大阪標準時");
+    expect(zoneResolutions).toBe(2);
 
     app.cleanup();
+  });
+
+  it("ignores a pending full-screen rejection after cleanup", async () => {
+    let rejectFullscreen: ((reason?: unknown) => void) | undefined;
+    const fullscreenRequest = new Promise<void>((_resolve, reject) => {
+      rejectFullscreen = reject;
+    });
+    Object.defineProperty(document.documentElement, "requestFullscreen", {
+      configurable: true,
+      value: () => fullscreenRequest,
+    });
+    Object.defineProperty(document, "fullscreenElement", {
+      configurable: true,
+      value: null,
+    });
+    const app = setup();
+    const status = app.root.querySelector<HTMLElement>('[role="status"]');
+    if (!status || !rejectFullscreen) throw new Error("Full-screen test setup failed");
+
+    control<HTMLButtonElement>(app.root, "settings-trigger").click();
+    control<HTMLButtonElement>(app.root, "settings-fullscreen").click();
+    app.cleanup();
+    rejectFullscreen(new Error("Denied after cleanup"));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(status.textContent).toBe("");
   });
 
   it("cleans up the ticker, dialog, and visibility listener and ignores late callbacks", () => {

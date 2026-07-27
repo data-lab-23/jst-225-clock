@@ -42,18 +42,21 @@ export function createApp(dependencies: AppDependencies): () => void {
   applyTheme(root, settings);
 
   const view = createClockView(root);
+  let active = true;
   const settingsDialog = createSettingsDialog({
     trigger: requiredElement(root, "#settings-trigger"),
     dialog: requiredElement(root, "#settings-dialog"),
     initialSettings: settings,
     onChange(nextSettings) {
+      if (!active) return;
       const validated = validateSettings(nextSettings);
       applyTheme(root, validated);
       saveSettings(storage, validated);
     },
-    onStatus: (message) => view.setStatus(message),
+    onStatus(message) {
+      if (active) view.setStatus(message);
+    },
   });
-  let active = true;
   let renderedDateKey: string | undefined;
   let zone: TimeZoneInfo | undefined;
 
@@ -71,6 +74,7 @@ export function createApp(dependencies: AppDependencies): () => void {
   };
   const handleVisibilityChange = () => {
     if (appDocument.visibilityState === "visible") {
+      zone = undefined;
       render(now());
     }
   };
