@@ -23,7 +23,8 @@ export function startMarketRefresh(dependencies: MarketRefreshDependencies): () 
     root,
     document: appDocument,
     random = Math.random,
-    prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    prefersReducedMotion = () => typeof window.matchMedia === "function"
+      && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
     setTimer = setTimeout,
     clearTimer = clearTimeout,
   } = dependencies;

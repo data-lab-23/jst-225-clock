@@ -56,9 +56,11 @@ describe("createClockView", () => {
     expect(field(root, "title-ja").textContent).toBe("日本標準時");
     expect(field(root, "title-en").textContent).toBe("Japan Standard Time 225");
     expect(field(root, "time").textContent).toBe("14:35");
+    expect(field(root, "time").dataset.ghostValue).toBe("14:35");
     expect(field(root, "date").textContent).toBe("2026.07.26");
     expect(field(root, "weekday").textContent).toBe("日曜日 / Sunday");
     expect(field(root, "seconds").textContent).toBe("42");
+    expect(field(root, "seconds").dataset.tickParity).toBe("even");
     expect(field(root, "zone").textContent).toBe("Asia/Tokyo（JST）");
     expect(root.querySelector('[role="status"]')?.textContent).toBe("時刻を更新しました");
   });
@@ -73,7 +75,9 @@ describe("createClockView", () => {
 
     expect(field(root, "time")).toBe(timeField);
     expect(field(root, "time").textContent).toBe("14:36");
+    expect(field(root, "time").dataset.ghostValue).toBe("14:36");
     expect(field(root, "seconds").textContent).toBe("43");
+    expect(field(root, "seconds").dataset.tickParity).toBe("odd");
     expect(root.querySelectorAll("[data-clock-field]")).toHaveLength(7);
   });
 

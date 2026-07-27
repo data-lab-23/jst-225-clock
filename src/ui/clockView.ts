@@ -42,9 +42,12 @@ export function createClockView(root: HTMLElement): ClockView {
       fields.titleJa.textContent = zone.titleJa;
       fields.titleEn.textContent = zone.titleEn;
       fields.time.textContent = snapshot.time;
+      fields.time.dataset.ghostValue = snapshot.time;
       fields.date.textContent = snapshot.date;
       fields.weekday.textContent = snapshot.weekday;
       fields.seconds.textContent = snapshot.seconds;
+      fields.seconds.dataset.tickParity =
+        Number.parseInt(snapshot.seconds, 10) % 2 === 0 ? "even" : "odd";
       fields.zone.textContent = `${zone.id}（${zone.abbreviation}）`;
     },
     setStatus(message) {

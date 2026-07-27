@@ -115,4 +115,30 @@ describe("startMarketRefresh", () => {
     expect(root.classList.contains("is-market-refreshing")).toBe(false);
     stop();
   });
+
+  it("keeps scheduling when the browser has no matchMedia implementation", () => {
+    const root = document.createElement("section");
+    const originalMatchMedia = window.matchMedia;
+    Object.defineProperty(window, "matchMedia", {
+      configurable: true,
+      value: undefined,
+    });
+
+    try {
+      const stop = startMarketRefresh({
+        root,
+        document,
+        random: () => 0,
+      });
+
+      vi.advanceTimersByTime(MIN_REFRESH_DELAY_MS);
+      expect(root.classList.contains("is-market-refreshing")).toBe(true);
+      stop();
+    } finally {
+      Object.defineProperty(window, "matchMedia", {
+        configurable: true,
+        value: originalMatchMedia,
+      });
+    }
+  });
 });

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createApp } from "./main";
 import type { ClockSettings } from "./settings/settings";
@@ -37,7 +37,7 @@ function clockFixture(): HTMLElement {
       <span data-clock-field="title-en"></span>
       <button id="settings-trigger" type="button">設定</button>
     </header>
-    <section>
+    <section class="clock-board">
       <span data-clock-field="time"></span>
       <span data-clock-field="date"></span>
       <span data-clock-field="weekday"></span>
@@ -340,5 +340,31 @@ describe("createApp", () => {
     document.dispatchEvent(new Event("visibilitychange"));
 
     expect(field(app.root, "time").textContent).toBe(timeBeforeCleanup);
+  });
+
+  it("starts the market refresh on the board and cleans it up exactly once", () => {
+    const root = clockFixture();
+    const stopRefresh = vi.fn();
+    const startRefresh = vi.fn(() => stopRefresh);
+    const cleanup = createApp({
+      root,
+      storage: memoryStorage().storage,
+      now: () => new Date(2026, 6, 26, 14, 35, 42),
+      startTicker: () => () => undefined,
+      startRefresh,
+      resolveZone: () => TOKYO_ZONE,
+      document,
+    });
+    const board = root.querySelector<HTMLElement>(".clock-board");
+
+    expect(startRefresh).toHaveBeenCalledTimes(1);
+    expect(startRefresh).toHaveBeenCalledWith(expect.objectContaining({
+      root: board,
+      document,
+    }));
+
+    cleanup();
+    cleanup();
+    expect(stopRefresh).toHaveBeenCalledTimes(1);
   });
 });

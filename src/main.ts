@@ -2,6 +2,7 @@ import "./styles.css";
 
 import { formatClock } from "./clock/clock";
 import { startAlignedTicker } from "./clock/scheduler";
+import { startMarketRefresh } from "./effects/marketRefresh";
 import { validateSettings } from "./settings/settings";
 import { loadSettings, saveSettings } from "./settings/storage";
 import { resolveTimeZone, type TimeZoneInfo } from "./time-zone/timeZone";
@@ -14,6 +15,7 @@ export interface AppDependencies {
   storage: Storage;
   now?: () => Date;
   startTicker?: (onTick: (date: Date) => void) => () => void;
+  startRefresh?: typeof startMarketRefresh;
   resolveZone?: (date: Date) => TimeZoneInfo;
   document?: Document;
 }
@@ -34,6 +36,7 @@ export function createApp(dependencies: AppDependencies): () => void {
     storage,
     now = () => new Date(),
     startTicker = startAlignedTicker,
+    startRefresh = startMarketRefresh,
     resolveZone = resolveTimeZone,
     document: appDocument = document,
   } = dependencies;
@@ -82,11 +85,16 @@ export function createApp(dependencies: AppDependencies): () => void {
   render(now());
   appDocument.addEventListener("visibilitychange", handleVisibilityChange);
   const stopTicker = startTicker(render);
+  const stopRefresh = startRefresh({
+    root: requiredElement(root, ".clock-board"),
+    document: appDocument,
+  });
 
   return () => {
     if (!active) return;
     active = false;
     stopTicker();
+    stopRefresh();
     settingsDialog.destroy();
     appDocument.removeEventListener("visibilitychange", handleVisibilityChange);
   };
