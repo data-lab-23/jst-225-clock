@@ -82,6 +82,7 @@ export function createSettingsDialog(options: SettingsDialogOptions): SettingsDi
   const finishClose = () => {
     if (!isOpen) return;
     isOpen = false;
+    document.removeEventListener("focusin", handleFocusin);
     dialog.hidden = true;
     trigger.focus();
   };
@@ -101,6 +102,7 @@ export function createSettingsDialog(options: SettingsDialogOptions): SettingsDi
       }
     }
 
+    document.addEventListener("focusin", handleFocusin);
     controls.textScale.focus();
   };
 
@@ -152,6 +154,10 @@ export function createSettingsDialog(options: SettingsDialogOptions): SettingsDi
       first.focus();
     }
   };
+  const handleFocusin = (event: FocusEvent) => {
+    if (!isOpen || dialog.contains(event.target as Node | null)) return;
+    controls.textScale.focus();
+  };
   const handleFullscreen = () => {
     const fullscreenDocument = document as Document & {
       exitFullscreen?: () => Promise<void>;
@@ -190,6 +196,7 @@ export function createSettingsDialog(options: SettingsDialogOptions): SettingsDi
     close,
     destroy() {
       if (destroyed) return;
+      close();
       destroyed = true;
       trigger.removeEventListener("click", handleTriggerClick);
       for (const input of [controls.textScale, controls.displayScale, controls.panelColor, controls.accentColor, controls.textColor]) {
@@ -201,6 +208,7 @@ export function createSettingsDialog(options: SettingsDialogOptions): SettingsDi
       dialog.removeEventListener("keydown", handleKeydown);
       dialog.removeEventListener("cancel", handleCancel);
       dialog.removeEventListener("close", handleNativeClose);
+      document.removeEventListener("focusin", handleFocusin);
     },
   };
 }

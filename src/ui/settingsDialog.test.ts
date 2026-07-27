@@ -11,6 +11,7 @@ const FULLSCREEN_FAILURE_MESSAGE = "フルスクリーンに切り替えられ�
 function createFixture() {
   document.body.innerHTML = `
     <button id="settings-trigger" type="button">設定</button>
+    <button id="background-action" type="button">背景の操作</button>
     <dialog id="settings-dialog" hidden>
       <h2 id="settings-dialog-title">表示設定</h2>
       <label for="settings-text-scale">文字サイズ</label>
@@ -124,6 +125,15 @@ describe("createSettingsDialog", () => {
     expect(document.activeElement).toBe(last);
   });
 
+  it("returns programmatic background focus to the modal while the fallback is open", () => {
+    const { controller } = setup();
+    controller.open();
+
+    control<HTMLButtonElement>("background-action").focus();
+
+    expect(document.activeElement).toBe(control("settings-text-scale"));
+  });
+
   it("removes all listeners when destroyed", () => {
     const { controller, trigger, dialog, onChange } = setup();
     controller.destroy();
@@ -134,6 +144,16 @@ describe("createSettingsDialog", () => {
 
     expect(dialog.hidden).toBe(true);
     expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("hides an open fallback dialog and restores trigger focus when destroyed", () => {
+    const { controller, dialog, trigger } = setup();
+    controller.open();
+
+    controller.destroy();
+
+    expect(dialog.hidden).toBe(true);
+    expect(document.activeElement).toBe(trigger);
   });
 
   it("enters full-screen when the document is not full-screen", async () => {
