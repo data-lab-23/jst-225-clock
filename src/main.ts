@@ -24,8 +24,8 @@ function requiredElement<T extends HTMLElement>(root: HTMLElement, selector: str
   return element;
 }
 
-function localDateKey(date: Date): string {
-  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+function zoneCacheKey(date: Date): string {
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}@${date.getTimezoneOffset()}`;
 }
 
 export function createApp(dependencies: AppDependencies): () => void {
@@ -57,16 +57,16 @@ export function createApp(dependencies: AppDependencies): () => void {
       if (active) view.setStatus(message);
     },
   });
-  let renderedDateKey: string | undefined;
+  let renderedZoneKey: string | undefined;
   let zone: TimeZoneInfo | undefined;
 
   const render = (date: Date) => {
     if (!active) return;
 
-    const dateKey = localDateKey(date);
-    if (!zone || dateKey !== renderedDateKey) {
+    const cacheKey = zoneCacheKey(date);
+    if (!zone || cacheKey !== renderedZoneKey) {
       zone = resolveZone(date);
-      renderedDateKey = dateKey;
+      renderedZoneKey = cacheKey;
     }
 
     view.render(formatClock(date), zone);

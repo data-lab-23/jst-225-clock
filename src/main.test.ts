@@ -38,11 +38,11 @@ function clockFixture(): HTMLElement {
       <button id="settings-trigger" type="button">設定</button>
     </header>
     <section>
-      <output data-clock-field="time"></output>
-      <output data-clock-field="date"></output>
-      <output data-clock-field="weekday"></output>
-      <output data-clock-field="seconds"></output>
-      <output data-clock-field="zone"></output>
+      <span data-clock-field="time"></span>
+      <span data-clock-field="date"></span>
+      <span data-clock-field="weekday"></span>
+      <span data-clock-field="seconds"></span>
+      <span data-clock-field="zone"></span>
     </section>
     <p role="status"></p>
     <dialog id="settings-dialog" hidden>
@@ -226,6 +226,35 @@ describe("createApp", () => {
     expect(field(app.root, "date").textContent).toBe("2026.07.27");
     expect(field(app.root, "weekday").textContent).toBe("月曜日 / Monday");
     expect(field(app.root, "zone").textContent).toContain("Asia/Osaka");
+    expect(zoneResolutions).toBe(2);
+
+    app.cleanup();
+  });
+
+  it("re-detects the zone when the UTC offset changes during the same local date", () => {
+    let zoneResolutions = 0;
+    const beforeOffsetChange = new Date(2026, 6, 26, 1, 30, 0);
+    const afterOffsetChange = new Date(2026, 6, 26, 2, 30, 0);
+    Object.defineProperty(beforeOffsetChange, "getTimezoneOffset", {
+      value: () => 240,
+    });
+    Object.defineProperty(afterOffsetChange, "getTimezoneOffset", {
+      value: () => 300,
+    });
+    const app = setup({
+      initialDate: beforeOffsetChange,
+      resolveZone: () => {
+        zoneResolutions += 1;
+        return zoneResolutions === 1
+          ? { ...TOKYO_ZONE, abbreviation: "DST" }
+          : { ...TOKYO_ZONE, abbreviation: "STD" };
+      },
+    });
+
+    expect(field(app.root, "zone").textContent).toContain("DST");
+    app.tick(afterOffsetChange);
+
+    expect(field(app.root, "zone").textContent).toContain("STD");
     expect(zoneResolutions).toBe(2);
 
     app.cleanup();

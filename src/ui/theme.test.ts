@@ -20,6 +20,8 @@ describe("applyTheme", () => {
     expect(root.style.getPropertyValue("--panel-color")).toBe("#075ed8");
     expect(root.style.getPropertyValue("--accent-color")).toBe("#c62f45");
     expect(root.style.getPropertyValue("--text-color")).toBe("#ffffff");
+    expect(root.style.getPropertyValue("--panel-foreground")).toBe("#ffffff");
+    expect(root.style.getPropertyValue("--accent-foreground")).toBe("#ffffff");
   });
 
   it("keeps the approved default display colours at the large-text 3:1 threshold", () => {
@@ -37,7 +39,9 @@ describe("applyTheme", () => {
       textColor: "#222222",
     });
 
-    expect(root.style.getPropertyValue("--text-color")).toBe("#ffffff");
+    expect(root.style.getPropertyValue("--text-color")).toBe("#222222");
+    expect(root.style.getPropertyValue("--panel-foreground")).toBe("#ffffff");
+    expect(root.style.getPropertyValue("--accent-foreground")).toBe("#ffffff");
   });
 
   it("chooses black for light display backgrounds when the selected text fails 3:1", () => {
@@ -50,9 +54,31 @@ describe("applyTheme", () => {
       textColor: "#f7ffff",
     });
 
-    expect(root.style.getPropertyValue("--text-color")).toBe("#000000");
+    expect(root.style.getPropertyValue("--text-color")).toBe("#f7ffff");
+    expect(root.style.getPropertyValue("--panel-foreground")).toBe("#000000");
+    expect(root.style.getPropertyValue("--accent-foreground")).toBe("#000000");
     expect(contrastRatio("#000000", "#ffffff")).toBeGreaterThanOrEqual(3);
     expect(contrastRatio("#000000", "#eeeeee")).toBeGreaterThanOrEqual(3);
+  });
+
+  it("derives readable foregrounds independently for opposite panel and accent surfaces", () => {
+    const root = document.createElement("main");
+
+    applyTheme(root, {
+      ...DEFAULT_SETTINGS,
+      panelColor: "#000000",
+      accentColor: "#ffffff",
+      textColor: "#ffffff",
+    });
+
+    const panelForeground = root.style.getPropertyValue("--panel-foreground");
+    const accentForeground = root.style.getPropertyValue("--accent-foreground");
+
+    expect(root.style.getPropertyValue("--text-color")).toBe("#ffffff");
+    expect(panelForeground).toBe("#ffffff");
+    expect(accentForeground).toBe("#000000");
+    expect(contrastRatio(panelForeground, "#000000")).toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(accentForeground, "#ffffff")).toBeGreaterThanOrEqual(3);
   });
 });
 

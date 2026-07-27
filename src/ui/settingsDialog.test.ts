@@ -7,6 +7,8 @@ import { hasMinimumContrast } from "./theme";
 import { createSettingsDialog } from "./settingsDialog";
 
 const FULLSCREEN_FAILURE_MESSAGE = "フルスクリーンに切り替えられませんでした";
+const ENTER_FULLSCREEN_LABEL = "全画面表示";
+const EXIT_FULLSCREEN_LABEL = "全画面表示を終了";
 
 function createFixture() {
   document.body.innerHTML = `
@@ -156,33 +158,93 @@ describe("createSettingsDialog", () => {
     expect(document.activeElement).toBe(trigger);
   });
 
-  it("enters full-screen when the document is not full-screen", async () => {
-    const { controller } = setup();
-    const requestFullscreen = vi.fn().mockResolvedValue(undefined);
-    Object.defineProperty(document.documentElement, "requestFullscreen", { configurable: true, value: requestFullscreen });
+  it("initializes the full-screen button for entering full-screen", () => {
     Object.defineProperty(document, "fullscreenElement", { configurable: true, value: null });
+
+    setup();
+
+    expect(control<HTMLButtonElement>("settings-fullscreen").textContent).toBe(ENTER_FULLSCREEN_LABEL);
+    expect(control<HTMLButtonElement>("settings-fullscreen").getAttribute("aria-pressed")).toBe("false");
+  });
+
+  it("updates the button state after entering full-screen", async () => {
+    const { controller } = setup();
+    let fullscreenElement: Element | null = null;
+    const requestFullscreen = vi.fn().mockImplementation(async () => {
+      fullscreenElement = document.documentElement;
+    });
+    Object.defineProperty(document.documentElement, "requestFullscreen", { configurable: true, value: requestFullscreen });
+    Object.defineProperty(document, "fullscreenElement", {
+      configurable: true,
+      get: () => fullscreenElement,
+    });
 
     controller.open();
     control<HTMLButtonElement>("settings-fullscreen").click();
+    await Promise.resolve();
     await Promise.resolve();
 
     expect(requestFullscreen).toHaveBeenCalledOnce();
+    expect(control<HTMLButtonElement>("settings-fullscreen").textContent).toBe(EXIT_FULLSCREEN_LABEL);
+    expect(control<HTMLButtonElement>("settings-fullscreen").getAttribute("aria-pressed")).toBe("true");
   });
 
-  it("exits full-screen when the document is already full-screen", async () => {
-    const { controller } = setup();
-    const exitFullscreen = vi.fn().mockResolvedValue(undefined);
+  it("updates the button state after exiting full-screen", async () => {
+    let fullscreenElement: Element | null = document.documentElement;
+    const exitFullscreen = vi.fn().mockImplementation(async () => {
+      fullscreenElement = null;
+    });
     Object.defineProperty(document, "exitFullscreen", { configurable: true, value: exitFullscreen });
-    Object.defineProperty(document, "fullscreenElement", { configurable: true, value: document.documentElement });
+    Object.defineProperty(document, "fullscreenElement", {
+      configurable: true,
+      get: () => fullscreenElement,
+    });
+    const { controller } = setup();
+
+    controller.open();
+    control<HTMLButtonElement>("settings-fullscreen").click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(exitFullscreen).toHaveBeenCalledOnce();
+    expect(control<HTMLButtonElement>("settings-fullscreen").textContent).toBe(ENTER_FULLSCREEN_LABEL);
+    expect(control<HTMLButtonElement>("settings-fullscreen").getAttribute("aria-pressed")).toBe("false");
+  });
+
+  it("updates the button state after an external Escape exit", () => {
+    let fullscreenElement: Element | null = document.documentElement;
+    Object.defineProperty(document, "fullscreenElement", {
+      configurable: true,
+      get: () => fullscreenElement,
+    });
+    setup();
+
+    expect(control<HTMLButtonElement>("settings-fullscreen").textContent).toBe(EXIT_FULLSCREEN_LABEL);
+    fullscreenElement = null;
+    document.dispatchEvent(new Event("fullscreenchange"));
+
+    expect(control<HTMLButtonElement>("settings-fullscreen").textContent).toBe(ENTER_FULLSCREEN_LABEL);
+    expect(control<HTMLButtonElement>("settings-fullscreen").getAttribute("aria-pressed")).toBe("false");
+  });
+
+  it("reports unsupported full-screen requests", async () => {
+    Object.defineProperty(document.documentElement, "requestFullscreen", {
+      configurable: true,
+      value: undefined,
+    });
+    Object.defineProperty(document, "fullscreenElement", { configurable: true, value: undefined });
+    const { controller, onStatus } = setup();
 
     controller.open();
     control<HTMLButtonElement>("settings-fullscreen").click();
     await Promise.resolve();
 
-    expect(exitFullscreen).toHaveBeenCalledOnce();
+    expect(onStatus).toHaveBeenCalledWith(FULLSCREEN_FAILURE_MESSAGE);
+    expect(control<HTMLButtonElement>("settings-fullscreen").textContent).toBe(ENTER_FULLSCREEN_LABEL);
+    expect(control<HTMLButtonElement>("settings-fullscreen").getAttribute("aria-pressed")).toBe("false");
   });
 
-  it("reports a full-screen rejection without closing the dialog", async () => {
+  it("reports a full-screen request rejection without closing the dialog", async () => {
     const { controller, dialog, onStatus } = setup();
     Object.defineProperty(document.documentElement, "requestFullscreen", {
       configurable: true,
@@ -197,6 +259,27 @@ describe("createSettingsDialog", () => {
 
     expect(onStatus).toHaveBeenCalledWith(FULLSCREEN_FAILURE_MESSAGE);
     expect(dialog.hidden).toBe(false);
+  });
+
+  it("reports a full-screen exit rejection and preserves active state", async () => {
+    Object.defineProperty(document, "exitFullscreen", {
+      configurable: true,
+      value: vi.fn().mockRejectedValue(new Error("Denied")),
+    });
+    Object.defineProperty(document, "fullscreenElement", {
+      configurable: true,
+      value: document.documentElement,
+    });
+    const { controller, onStatus } = setup();
+
+    controller.open();
+    control<HTMLButtonElement>("settings-fullscreen").click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(onStatus).toHaveBeenCalledWith(FULLSCREEN_FAILURE_MESSAGE);
+    expect(control<HTMLButtonElement>("settings-fullscreen").textContent).toBe(EXIT_FULLSCREEN_LABEL);
+    expect(control<HTMLButtonElement>("settings-fullscreen").getAttribute("aria-pressed")).toBe("true");
   });
 });
 

@@ -27,11 +27,11 @@ function createFixture(): HTMLElement {
       <button id="settings-trigger" type="button" aria-label="表示設定を開く">設定</button>
     </header>
     <section>
-      <output data-clock-field="time"></output>
-      <output data-clock-field="date"></output>
-      <output data-clock-field="weekday"></output>
-      <output data-clock-field="seconds"></output>
-      <output data-clock-field="zone"></output>
+      <span data-clock-field="time"></span>
+      <span data-clock-field="date"></span>
+      <span data-clock-field="weekday"></span>
+      <span data-clock-field="seconds"></span>
+      <span data-clock-field="zone"></span>
     </section>
     <p role="status"></p>
     <dialog id="settings-dialog"></dialog>

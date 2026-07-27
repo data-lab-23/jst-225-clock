@@ -13,11 +13,16 @@ function rule(selector: string): string {
 }
 
 describe("clock board CSS contracts", () => {
-  it("uses the app theme text colour for the board and date row while preserving blue time numerals", () => {
-    expect(rule("#app")).toMatch(/color:\s*var\(--text-color\)/);
-    expect(rule(".clock-board")).toMatch(/color:\s*var\(--text-color\)/);
-    expect(rule(".date-row")).toMatch(/color:\s*var\(--text-color\)/);
+  it("uses independent readable foregrounds for the panel and accent row while preserving blue time numerals", () => {
+    expect(rule(".clock-panel")).toMatch(/color:\s*var\(--panel-foreground\)/);
+    expect(rule(".date-row")).toMatch(/color:\s*var\(--accent-foreground\)/);
     expect(rule(".primary-time")).toMatch(/color:\s*#075bdb/);
+  });
+
+  it("shows non-empty status feedback without intercepting pointer input", () => {
+    expect(rule(".app-status")).toMatch(/position:\s*fixed/);
+    expect(rule(".app-status")).toMatch(/pointer-events:\s*none/);
+    expect(rule(".app-status:empty")).toMatch(/display:\s*none/);
   });
 
   it("compacts wide short viewports so the full board remains visible", () => {

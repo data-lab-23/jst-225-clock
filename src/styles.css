@@ -8,6 +8,8 @@
   --panel-color: #0669f5;
   --accent-color: #ed354e;
   --text-color: #f7ffff;
+  --panel-foreground: #f7ffff;
+  --accent-foreground: #f7ffff;
 }
 
 * { box-sizing: border-box; }
@@ -16,7 +18,7 @@ html, body { min-width: 0; margin: 0; }
 
 body { min-height: 100dvh; overflow-x: hidden; }
 
-button, output { font: inherit; }
+button { font: inherit; }
 
 button:focus-visible { outline: 3px solid #f7ffff; outline-offset: 3px; }
 
@@ -82,6 +84,7 @@ button:focus-visible { outline: 3px solid #f7ffff; outline-offset: 3px; }
 
 .clock-panel {
   padding: clamp(1rem, 3vw, 2.5rem);
+  color: var(--panel-foreground);
   background: linear-gradient(135deg, color-mix(in srgb, var(--panel-color) 92%, #003fa5), var(--panel-color));
 }
 
@@ -116,7 +119,7 @@ button:focus-visible { outline: 3px solid #f7ffff; outline-offset: 3px; }
   text-transform: uppercase;
 }
 
-.primary-value, .clock-row output {
+.primary-value, .clock-row [data-clock-field] {
   display: block;
   overflow-wrap: anywhere;
   font-variant-numeric: tabular-nums;
@@ -156,22 +159,31 @@ button:focus-visible { outline: 3px solid #f7ffff; outline-offset: 3px; }
 }
 
 .date-row {
-  color: var(--text-color);
+  color: var(--accent-foreground);
   border-color: transparent;
   background: var(--accent-color);
   box-shadow: 0 0.65rem 1.4rem rgb(0 30 93 / 20%);
 }
 
-.sr-only {
-  position: absolute;
-  inline-size: 1px;
-  block-size: 1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+.app-status {
+  position: fixed;
+  z-index: 2;
+  inset-inline: 1rem;
+  inset-block-end: max(1rem, env(safe-area-inset-bottom));
+  inline-size: fit-content;
+  max-inline-size: min(36rem, calc(100% - 2rem));
+  margin: 0 auto;
+  border: 1px solid rgb(247 255 255 / 35%);
+  border-radius: 0.65rem;
+  padding: 0.75rem 1rem;
+  color: #f7ffff;
+  background: #07101f;
+  box-shadow: 0 0.7rem 2rem rgb(0 0 0 / 35%);
+  line-height: 1.5;
+  pointer-events: none;
 }
+
+.app-status:empty { display: none; }
 
 dialog { color: #07101f; }
 

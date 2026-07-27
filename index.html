@@ -6,7 +6,7 @@
     <title>JST 225 Clock</title>
   </head>
   <body>
-    <main id="app">
+    <main id="app" aria-busy="true">
       <section class="clock-board" aria-labelledby="clock-title-ja">
         <header class="clock-header">
           <div class="clock-title-group">
@@ -19,31 +19,31 @@
         <div class="clock-panel">
           <section class="primary-time" aria-labelledby="time-label">
             <p class="field-label" id="time-label"><span lang="ja">現在時刻</span><span lang="en">Current Time</span></p>
-            <output class="primary-value" data-clock-field="time">--:--</output>
+            <span class="primary-value" data-clock-field="time">--:--</span>
           </section>
 
           <dl class="clock-rows">
             <div class="clock-row date-row">
               <dt class="field-label"><span lang="ja">日付</span><span lang="en">Date</span></dt>
-              <dd><output data-clock-field="date">----</output></dd>
+              <dd><span data-clock-field="date">----</span></dd>
             </div>
             <div class="clock-row">
               <dt class="field-label"><span lang="ja">曜日</span><span lang="en">Day</span></dt>
-              <dd><output data-clock-field="weekday">----</output></dd>
+              <dd><span data-clock-field="weekday">----</span></dd>
             </div>
             <div class="clock-row">
               <dt class="field-label"><span lang="ja">秒</span><span lang="en">Seconds</span></dt>
-              <dd><output data-clock-field="seconds">--</output></dd>
+              <dd><span data-clock-field="seconds">--</span></dd>
             </div>
             <div class="clock-row">
               <dt class="field-label"><span lang="ja">時間帯</span><span lang="en">Time Zone</span></dt>
-              <dd><output data-clock-field="zone">Asia/Tokyo（JST）</output></dd>
+              <dd><span data-clock-field="zone">Asia/Tokyo（JST）</span></dd>
             </div>
           </dl>
         </div>
       </section>
 
-      <p class="sr-only" role="status" aria-live="polite"></p>
+      <p class="app-status" role="status" aria-live="polite"></p>
 
       <dialog id="settings-dialog" class="settings-dialog" aria-labelledby="settings-dialog-title" hidden>
         <h2 id="settings-dialog-title">表示設定</h2>

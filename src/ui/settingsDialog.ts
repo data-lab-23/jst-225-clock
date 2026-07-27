@@ -15,6 +15,8 @@ export interface SettingsDialogController {
 }
 
 const FULLSCREEN_FAILURE_MESSAGE = "フルスクリーンに切り替えられませんでした";
+const ENTER_FULLSCREEN_LABEL = "全画面表示";
+const EXIT_FULLSCREEN_LABEL = "全画面表示を終了";
 
 interface DialogControls {
   textScale: HTMLInputElement;
@@ -158,7 +160,15 @@ export function createSettingsDialog(options: SettingsDialogOptions): SettingsDi
     if (!isOpen || dialog.contains(event.target as Node | null)) return;
     controls.textScale.focus();
   };
-  const handleFullscreen = () => {
+  const syncFullscreenControl = () => {
+    const fullscreenActive = Boolean(document.fullscreenElement);
+    controls.fullscreen.textContent = fullscreenActive
+      ? EXIT_FULLSCREEN_LABEL
+      : ENTER_FULLSCREEN_LABEL;
+    controls.fullscreen.setAttribute("aria-pressed", String(fullscreenActive));
+  };
+  const handleFullscreenChange = () => syncFullscreenControl();
+  const handleFullscreen = async () => {
     const fullscreenDocument = document as Document & {
       exitFullscreen?: () => Promise<void>;
     };
@@ -166,16 +176,17 @@ export function createSettingsDialog(options: SettingsDialogOptions): SettingsDi
       requestFullscreen?: () => Promise<void>;
     };
 
-    const action = document.fullscreenElement
-      ? fullscreenDocument.exitFullscreen?.()
-      : root.requestFullscreen?.();
+    try {
+      const action = document.fullscreenElement
+        ? fullscreenDocument.exitFullscreen?.()
+        : root.requestFullscreen?.();
 
-    if (!action) {
+      if (!action) throw new Error("Full-screen API unavailable");
+      await action;
+      syncFullscreenControl();
+    } catch {
       onStatus(FULLSCREEN_FAILURE_MESSAGE);
-      return;
     }
-
-    void Promise.resolve(action).catch(() => onStatus(FULLSCREEN_FAILURE_MESSAGE));
   };
 
   trigger.addEventListener("click", handleTriggerClick);
@@ -188,8 +199,10 @@ export function createSettingsDialog(options: SettingsDialogOptions): SettingsDi
   dialog.addEventListener("keydown", handleKeydown);
   dialog.addEventListener("cancel", handleCancel);
   dialog.addEventListener("close", handleNativeClose);
+  document.addEventListener("fullscreenchange", handleFullscreenChange);
 
   syncControls();
+  syncFullscreenControl();
 
   return {
     open,
@@ -208,6 +221,7 @@ export function createSettingsDialog(options: SettingsDialogOptions): SettingsDi
       dialog.removeEventListener("keydown", handleKeydown);
       dialog.removeEventListener("cancel", handleCancel);
       dialog.removeEventListener("close", handleNativeClose);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
       document.removeEventListener("focusin", handleFocusin);
     },
   };

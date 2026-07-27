@@ -30,29 +30,24 @@ export function hasMinimumContrast(first: string, second: string, minimum: numbe
   return contrastRatio(first, second) >= minimum;
 }
 
-function displayTextColor(settings: ClockSettings): string {
-  const isReadableOnPanel = hasMinimumContrast(settings.textColor, settings.panelColor, LARGE_TEXT_MINIMUM_CONTRAST);
-  const isReadableOnAccent = hasMinimumContrast(settings.textColor, settings.accentColor, LARGE_TEXT_MINIMUM_CONTRAST);
+function effectiveForeground(textColor: string, surfaceColor: string): string {
+  if (hasMinimumContrast(textColor, surfaceColor, LARGE_TEXT_MINIMUM_CONTRAST)) {
+    return textColor;
+  }
 
-  if (isReadableOnPanel && isReadableOnAccent) return settings.textColor;
-
-  const minimumContrast = (textColor: string) => Math.min(
-    contrastRatio(textColor, settings.panelColor),
-    contrastRatio(textColor, settings.accentColor),
-  );
-  const blackContrast = minimumContrast("#000000");
-  const whiteContrast = minimumContrast("#ffffff");
-
-  return blackContrast > whiteContrast ? "#000000" : "#ffffff";
+  return contrastRatio("#000000", surfaceColor) > contrastRatio("#ffffff", surfaceColor)
+    ? "#000000"
+    : "#ffffff";
 }
 
 export function applyTheme(root: HTMLElement, settings: ClockSettings): void {
   const validated = validateSettings(settings);
-  const textColor = displayTextColor(validated);
 
   root.style.setProperty("--text-scale", String(validated.textScale));
   root.style.setProperty("--display-scale", String(validated.displayScale));
   root.style.setProperty("--panel-color", validated.panelColor);
   root.style.setProperty("--accent-color", validated.accentColor);
-  root.style.setProperty("--text-color", textColor);
+  root.style.setProperty("--text-color", validated.textColor);
+  root.style.setProperty("--panel-foreground", effectiveForeground(validated.textColor, validated.panelColor));
+  root.style.setProperty("--accent-foreground", effectiveForeground(validated.textColor, validated.accentColor));
 }
