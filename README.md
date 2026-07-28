@@ -45,3 +45,14 @@ GitHub Pages のプロジェクトサイトは `/<リポジトリ名>/` 配下�
 ```bash
 VITE_BASE_PATH=/jst-225-clock/ npm run build
 ```
+
+## 検索エンジン向けの構成
+
+時計のファーストビューを維持しながら、ページ下部に日本標準時、機能、使い方、よくある質問を静的HTMLで掲載しています。JavaScriptを実行する前でも、検索エンジンと利用者がページの用途を理解できます。
+
+検索向けのtitleとdescription、canonical、Open Graph、Twitter Card、`WebApplication`構造化データを`index.html`に記述しています。クロール用ファイルは次のURLで公開されます。
+
+- `https://data-lab-23.github.io/jst-225-clock/robots.txt`
+- `https://data-lab-23.github.io/jst-225-clock/sitemap.xml`
+
+公開後はGoogle Search Consoleでサイト所有権を確認し、上記のサイトマップを送信できます。サイトマップの送信やインデックス登録リクエストは検索結果への掲載や順位を保証するものではありません。
