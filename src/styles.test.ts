@@ -26,6 +26,9 @@ describe("clock board CSS contracts", () => {
   });
 
   it("compacts wide short viewports so the full board remains visible", () => {
+    expect(styles).toMatch(
+      /@media \(max-height: 900px\)[\s\S]*?#app\s*\{[\s\S]*?padding-block:/,
+    );
     expect(styles).toMatch(/@media \(min-width: 761px\) and \(max-height: 820px\)/);
     expect(styles).toMatch(/@media \(min-width: 761px\) and \(max-height: 820px\)[\s\S]*?\.clock-header\s*\{[\s\S]*?padding:/);
     expect(styles).toMatch(/@media \(min-width: 761px\) and \(max-height: 820px\)[\s\S]*?\.clock-row\s*\{[\s\S]*?padding:/);

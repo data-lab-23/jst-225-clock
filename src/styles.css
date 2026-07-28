@@ -506,6 +506,10 @@ dialog { color: #07101f; }
   outline-offset: 3px;
 }
 
+@media (max-height: 900px) {
+  #app { padding-block: 0.25rem; }
+}
+
 @media (max-width: 760px) {
   .clock-row { grid-template-columns: 1fr; gap: 0.45rem; }
   .clock-row dd { text-align: left; }
