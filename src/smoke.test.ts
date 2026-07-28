@@ -36,4 +36,19 @@ describe("HTML entry point", () => {
     expect(status?.classList.contains("sr-only")).toBe(false);
     expect(status?.getAttribute("aria-live")).toBe("polite");
   });
+
+  it("provides useful static clock guidance below the clock-first stage", () => {
+    const html = readFileSync(resolve(process.cwd(), "index.html"), "utf8");
+    const parsed = new DOMParser().parseFromString(html, "text/html");
+
+    expect(parsed.querySelector(".clock-stage .clock-board")).not.toBeNull();
+    expect(parsed.querySelector(".clock-guide h2")?.textContent).toContain("日本標準時");
+    expect(parsed.querySelectorAll(".clock-guide article")).toHaveLength(4);
+    expect(parsed.querySelectorAll(".clock-guide details").length).toBeGreaterThanOrEqual(3);
+    expect(parsed.querySelector(".clock-guide [lang='en']")?.textContent).toContain(
+      "Japan Standard Time",
+    );
+    expect(parsed.querySelector(".clock-guide__disclaimer")?.textContent).toContain("株価情報");
+    expect(parsed.querySelectorAll("[data-clock-field]")).toHaveLength(7);
+  });
 });
