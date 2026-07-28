@@ -54,6 +54,34 @@ describe("search discovery metadata", () => {
     });
     expect(jsonLd).not.toHaveProperty("aggregateRating");
   });
+
+  it("loads the exact AdSense publisher client without blocking the clock", () => {
+    const script = parsed.querySelector<HTMLScriptElement>(
+      'script[src^="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]',
+    );
+
+    expect(script).not.toBeNull();
+    expect(script?.hasAttribute("async")).toBe(true);
+    expect(script?.getAttribute("src")).toBe(
+      "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6402260099646942",
+    );
+    expect(script?.getAttribute("crossorigin")).toBe("anonymous");
+  });
+
+  it("keeps the labeled advertising placement below the clock with a privacy link", () => {
+    const placement = parsed.querySelector<HTMLElement>(".ad-placement");
+    const guide = parsed.querySelector<HTMLElement>(".clock-guide");
+    const stage = parsed.querySelector<HTMLElement>(".clock-stage");
+    const privacyLink = parsed.querySelector<HTMLAnchorElement>(
+      '.site-footer a[href="privacy.html"]',
+    );
+
+    expect(placement).not.toBeNull();
+    expect(placement?.textContent).toContain("広告");
+    expect(guide?.contains(placement)).toBe(true);
+    expect(stage?.contains(placement)).toBe(false);
+    expect(privacyLink?.textContent).toContain("プライバシー");
+  });
 });
 
 describe("crawler entry points", () => {
@@ -73,5 +101,41 @@ describe("crawler entry points", () => {
     const sitemap = readFileSync(sitemapPath, "utf8");
     expect(sitemap).toContain(`<loc>${canonicalUrl}</loc>`);
     expect(sitemap).toContain("<lastmod>2026-07-29</lastmod>");
+  });
+
+  it("publishes an accessible advertising privacy policy", () => {
+    const privacyPath = resolve(process.cwd(), "privacy.html");
+    expect(existsSync(privacyPath)).toBe(true);
+
+    const privacyHtml = readFileSync(privacyPath, "utf8");
+    const privacyDocument = new DOMParser().parseFromString(privacyHtml, "text/html");
+    const canonical = privacyDocument
+      .querySelector('link[rel="canonical"]')
+      ?.getAttribute("href");
+    const bodyText = privacyDocument.body.textContent ?? "";
+
+    expect(canonical).toBe(
+      "https://data-lab-23.github.io/jst-225-clock/privacy.html",
+    );
+    expect(bodyText).toContain("Google AdSense");
+    expect(bodyText).toContain("Cookie");
+    expect(bodyText).toContain("パーソナライズ広告");
+    expect(bodyText).toContain("非パーソナライズ広告");
+    expect(bodyText).toContain("data-lab-23");
+    expect(
+      privacyDocument.querySelector('a[href="https://adssettings.google.com/"]'),
+    ).not.toBeNull();
+    expect(
+      privacyDocument.querySelector('a[href="https://policies.google.com/privacy"]'),
+    ).not.toBeNull();
+    expect(privacyDocument.querySelector('a[href="./"]')).not.toBeNull();
+  });
+
+  it("lists the privacy policy in the sitemap", () => {
+    const sitemap = readFileSync(resolve(process.cwd(), "public/sitemap.xml"), "utf8");
+
+    expect(sitemap).toContain(
+      "<loc>https://data-lab-23.github.io/jst-225-clock/privacy.html</loc>",
+    );
   });
 });

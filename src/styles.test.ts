@@ -60,4 +60,15 @@ describe("clock board CSS contracts", () => {
       /:fullscreen\s+\.clock-guide\s*\{[\s\S]*?display:\s*none/,
     );
   });
+
+  it("separates advertising from content and removes it from fullscreen", () => {
+    expect(rule(".ad-placement")).toMatch(/border:/);
+    expect(rule(".ad-placement")).toMatch(/min-block-size:/);
+    expect(rule(".ad-placement")).toMatch(/contain:\s*layout paint/);
+    expect(rule(".ad-placement__label")).toMatch(/letter-spacing:/);
+    expect(rule(".ad-placement__label")).toMatch(/color:/);
+    expect(styles).toMatch(
+      /:fullscreen\s+\.ad-placement\s*\{[\s\S]*?display:\s*none/,
+    );
+  });
 });
