@@ -18,6 +18,9 @@ describe("search discovery metadata", () => {
     expect(parsed.querySelector('link[rel="canonical"]')?.getAttribute("href")).toBe(
       canonicalUrl,
     );
+    expect(
+      parsed.querySelector('meta[name="google-site-verification"]')?.getAttribute("content"),
+    ).toBe("zTMq_D0axaLmHIyprF-6pXTuXlenLS_yZ11rU5hGes0");
   });
 
   it("uses consistent social preview metadata", () => {
