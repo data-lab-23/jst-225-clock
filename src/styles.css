@@ -1,8 +1,10 @@
 :root {
   color: var(--text-color, #f7ffff);
   background: #07101f;
-  font-family: Inter, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", system-ui, sans-serif;
+  font-family: var(--font-broadcast-ja);
   font-synthesis: none;
+  --font-broadcast-ja: "Yu Gothic UI", "Yu Gothic", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --font-broadcast-numeric: "Arial Narrow", "DIN Alternate", "Roboto Condensed", "Helvetica Neue Condensed", Arial, sans-serif;
   --text-scale: 1;
   --display-scale: 1;
   --panel-color: #0669f5;
@@ -27,16 +29,34 @@ button:focus-visible { outline: 3px solid #f7ffff; outline-offset: 3px; }
   min-height: 100dvh;
   place-items: center;
   color: var(--text-color);
+  background:
+    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--panel-color) 14%, transparent), transparent 42rem),
+    linear-gradient(145deg, #030914, #081426 58%, #030814);
   padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
 }
 
 .clock-board {
+  position: relative;
+  isolation: isolate;
   inline-size: min(100%, 72rem);
   overflow: hidden;
   color: var(--text-color);
-  border: 1px solid rgb(247 255 255 / 24%);
-  border-radius: clamp(1rem, 2vw, 1.75rem);
-  box-shadow: 0 1.25rem 4rem rgb(0 0 0 / 40%), 0 0 3rem color-mix(in srgb, var(--panel-color) 48%, transparent);
+  border: 1px solid rgb(184 217 255 / 38%);
+  border-radius: clamp(0.7rem, 1.3vw, 1.2rem);
+  box-shadow:
+    0 1.6rem 5rem rgb(0 0 0 / 58%),
+    0 0 3.5rem color-mix(in srgb, var(--panel-color) 40%, transparent),
+    inset 0 0 0 1px rgb(0 19 67 / 52%);
+}
+
+.clock-board::before {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 1.5rem rgb(0 13 49 / 28%);
+  content: "";
+  pointer-events: none;
 }
 
 .clock-header {
@@ -54,18 +74,45 @@ button:focus-visible { outline: 3px solid #f7ffff; outline-offset: 3px; }
 .clock-title-ja, .clock-title-en, .field-label, .clock-row dd { margin: 0; }
 
 .clock-title-ja {
+  font-family: var(--font-broadcast-ja);
   font-size: calc(clamp(1.25rem, 2.5vw, 2rem) * var(--text-scale));
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-weight: 900;
+  font-feature-settings: "palt" 1;
+  letter-spacing: 0.045em;
+  text-shadow: 0 1px 0 #fff, 0 0 0.45rem rgb(161 220 255 / 30%);
 }
 
 .clock-title-en {
   margin-top: 0.2rem;
   color: rgb(247 255 255 / 72%);
+  font-family: var(--font-broadcast-numeric);
   font-size: calc(clamp(0.72rem, 1.3vw, 0.95rem) * var(--text-scale));
-  font-weight: 650;
-  letter-spacing: 0.08em;
+  font-stretch: condensed;
+  font-weight: 800;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  color: #ff5265;
+  font-family: var(--font-broadcast-numeric);
+  font-size: calc(clamp(0.62rem, 1vw, 0.78rem) * var(--text-scale));
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 0.55rem rgb(255 44 72 / 62%);
+  animation: live-indicator-pulse 2.4s ease-in-out infinite;
+}
+
+.live-indicator i {
+  inline-size: 0.55em;
+  block-size: 0.55em;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0.6rem currentColor;
 }
 
 #settings-trigger {
@@ -83,19 +130,78 @@ button:focus-visible { outline: 3px solid #f7ffff; outline-offset: 3px; }
 #settings-trigger:hover { background: rgb(247 255 255 / 14%); }
 
 .clock-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   padding: clamp(1rem, 3vw, 2.5rem);
   color: var(--panel-foreground);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--panel-color) 92%, #003fa5), var(--panel-color));
+  background:
+    linear-gradient(115deg, rgb(255 255 255 / 8%), transparent 24% 72%, rgb(0 28 112 / 18%)),
+    linear-gradient(135deg, color-mix(in srgb, var(--panel-color) 92%, #003fa5), var(--panel-color));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 24%),
+    inset 0 -1.2rem 2.5rem rgb(0 24 93 / 15%);
+}
+
+.clock-panel::before,
+.clock-panel::after {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+}
+
+.clock-panel::before {
+  border: 1px solid rgb(170 218 255 / 20%);
+  box-shadow: inset 0 0 2.2rem rgb(0 28 101 / 20%);
+}
+
+.clock-panel::after {
+  opacity: 0.34;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 3px,
+    rgb(0 11 52 / 11%) 4px
+  );
+  mix-blend-mode: multiply;
 }
 
 .primary-time {
+  position: relative;
+  isolation: isolate;
   display: grid;
   gap: clamp(0.55rem, 1.5vw, 1rem);
+  overflow: hidden;
   padding: clamp(1rem, 3.5vw, 2.6rem);
-  border-radius: clamp(0.75rem, 1.8vw, 1.25rem);
+  border: 1px solid rgb(199 222 235 / 92%);
+  border-radius: clamp(0.35rem, 0.8vw, 0.65rem);
   color: #075bdb;
-  background: #f7ffff;
-  box-shadow: inset 0 0 0 1px rgb(7 91 219 / 12%), 0 0.9rem 2.2rem rgb(0 34 96 / 26%);
+  background:
+    linear-gradient(180deg, #ffffff, #effbff 58%, #e6f4f8);
+  box-shadow:
+    inset 0 0 0 1px rgb(7 91 219 / 13%),
+    inset 0 -1rem 2rem rgb(23 103 161 / 8%),
+    0 0.9rem 2.2rem rgb(0 34 96 / 30%);
+}
+
+.primary-time::before {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 0 37%,
+    rgb(255 255 255 / 8%) 43%,
+    rgb(255 255 255 / 78%) 49%,
+    rgb(122 241 200 / 26%) 53%,
+    transparent 61% 100%
+  );
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-130%);
 }
 
 .field-label {
@@ -109,28 +215,63 @@ button:focus-visible { outline: 3px solid #f7ffff; outline-offset: 3px; }
 
 .field-label span[lang="ja"] {
   font-size: calc(clamp(1.05rem, 2.1vw, 1.65rem) * var(--text-scale));
-  font-weight: 800;
+  font-feature-settings: "palt" 1;
+  font-weight: 900;
+  letter-spacing: 0.015em;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 34%), 0 1px 2px rgb(0 25 89 / 38%);
 }
 
 .field-label span[lang="en"] {
+  font-family: var(--font-broadcast-numeric);
   font-size: calc(clamp(0.65rem, 1.15vw, 0.82rem) * var(--text-scale));
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  font-stretch: condensed;
+  font-weight: 850;
+  letter-spacing: 0.075em;
   text-transform: uppercase;
 }
 
-.primary-value, .clock-row [data-clock-field] {
+.primary-value, .primary-value-ghost, .clock-row [data-clock-field] {
   display: block;
   overflow-wrap: anywhere;
   font-variant-numeric: tabular-nums;
 }
 
+.primary-value-frame {
+  position: relative;
+  inline-size: 107.5%;
+  margin-inline-start: -7.5%;
+  transform: scaleX(0.93);
+  transform-origin: right center;
+}
+
+.primary-value-ghost,
 .primary-value {
+  font-family: var(--font-broadcast-numeric);
   font-size: calc(clamp(4rem, 13vw, 9rem) * var(--display-scale));
-  font-weight: 850;
-  letter-spacing: -0.075em;
-  line-height: 0.9;
+  font-stretch: condensed;
+  font-weight: 900;
+  letter-spacing: -0.09em;
+  line-height: 0.86;
   text-align: right;
+  text-shadow:
+    1px 0 0 #004fc4,
+    2px 1px 0 rgb(255 255 255 / 85%),
+    0 0 0.12rem rgb(0 61 168 / 50%);
+}
+
+.primary-value {
+  position: relative;
+  z-index: 2;
+}
+
+.primary-value-ghost {
+  position: absolute;
+  inset: 0;
+  color: #008b65;
+  opacity: 0;
+  pointer-events: none;
+  text-shadow: 0 0 0.7rem rgb(0 198 130 / 72%);
+  transform: translateY(0.04em);
 }
 
 .clock-rows {
@@ -146,23 +287,111 @@ button:focus-visible { outline: 3px solid #f7ffff; outline-offset: 3px; }
   gap: 1rem;
   padding: clamp(0.85rem, 2vw, 1.15rem) clamp(0.95rem, 2.2vw, 1.4rem);
   border: 1px solid rgb(247 255 255 / 23%);
-  border-radius: 0.72rem;
-  background: rgb(0 25 86 / 15%);
+  border-radius: 0.28rem;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 4%), rgb(0 31 111 / 8%)),
+    rgb(0 25 86 / 15%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%);
 }
 
 .clock-row dd {
+  font-family: var(--font-broadcast-numeric);
   font-size: calc(clamp(1.15rem, 2.5vw, 2.05rem) * var(--display-scale));
-  font-weight: 800;
-  letter-spacing: 0.01em;
+  font-stretch: condensed;
+  font-weight: 900;
+  letter-spacing: 0.025em;
   line-height: 1.1;
   text-align: right;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 38%), 0 2px 3px rgb(0 21 76 / 38%);
 }
 
 .date-row {
   color: var(--accent-foreground);
   border-color: transparent;
-  background: var(--accent-color);
-  box-shadow: 0 0.65rem 1.4rem rgb(0 30 93 / 20%);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 10%), rgb(128 0 24 / 9%)),
+    var(--accent-color);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 22%),
+    0 0.65rem 1.4rem rgb(0 30 93 / 22%);
+}
+
+[data-clock-field="seconds"][data-tick-parity="even"] {
+  animation: seconds-tick-even 160ms ease-out;
+}
+
+[data-clock-field="seconds"][data-tick-parity="odd"] {
+  animation: seconds-tick-odd 160ms ease-out;
+}
+
+.clock-board.is-market-refreshing .clock-panel {
+  animation: market-panel-bloom 700ms ease-out;
+}
+
+.clock-board.is-market-refreshing .primary-time {
+  animation: market-field-flash 700ms steps(1, end);
+}
+
+.clock-board.is-market-refreshing .primary-time::before {
+  animation: market-highlight-sweep 700ms cubic-bezier(0.18, 0.7, 0.2, 1);
+}
+
+.clock-board.is-market-refreshing .primary-value-ghost {
+  animation: market-value-ghost 700ms ease-out;
+}
+
+@keyframes live-indicator-pulse {
+  0%, 100% { opacity: 0.92; }
+  50% { opacity: 0.48; }
+}
+
+@keyframes seconds-tick-even {
+  0% { opacity: 0.5; filter: brightness(1.55); transform: translateY(0.05em); }
+  100% { opacity: 1; filter: none; transform: translateY(0); }
+}
+
+@keyframes seconds-tick-odd {
+  0% { opacity: 0.5; filter: brightness(1.55); transform: translateY(0.05em); }
+  100% { opacity: 1; filter: none; transform: translateY(0); }
+}
+
+@keyframes market-panel-bloom {
+  0%, 100% { filter: brightness(1) saturate(1); }
+  15% { filter: brightness(1.1) saturate(1.08); }
+  38% { filter: brightness(1.02) saturate(1.03); }
+}
+
+@keyframes market-field-flash {
+  0%, 100% {
+    background:
+      linear-gradient(180deg, #ffffff, #effbff 58%, #e6f4f8);
+    box-shadow:
+      inset 0 0 0 1px rgb(7 91 219 / 13%),
+      inset 0 -1rem 2rem rgb(23 103 161 / 8%),
+      0 0.9rem 2.2rem rgb(0 34 96 / 30%);
+  }
+  12% {
+    background: linear-gradient(180deg, #f2fff9, #dffcef 58%, #d8f5eb);
+    box-shadow:
+      inset 0 0 1.8rem rgb(0 183 118 / 22%),
+      0 0 1.6rem rgb(0 255 164 / 42%);
+  }
+  26% { background: linear-gradient(180deg, #ffffff, #effbff 58%, #e6f4f8); }
+  36% { background: linear-gradient(180deg, #f4fff9, #e8fbf3 58%, #e0f5ee); }
+}
+
+@keyframes market-highlight-sweep {
+  0% { opacity: 0; transform: translateX(-130%); }
+  12% { opacity: 0.88; }
+  72% { opacity: 0.4; }
+  100% { opacity: 0; transform: translateX(130%); }
+}
+
+@keyframes market-value-ghost {
+  0%, 8% { opacity: 0; transform: translateY(0.04em); }
+  14% { opacity: 0.28; transform: translateY(0.045em); }
+  42% { opacity: 0.12; }
+  100% { opacity: 0; transform: translateY(-0.07em); }
 }
 
 .app-status {
@@ -301,6 +530,7 @@ dialog { color: #07101f; }
   }
 
   .primary-value { font-size: calc(clamp(3.25rem, 10vh, 5.5rem) * var(--display-scale)); }
+  .primary-value-ghost { font-size: calc(clamp(3.25rem, 10vh, 5.5rem) * var(--display-scale)); }
 
   .clock-rows {
     gap: 0.35rem;
@@ -321,5 +551,19 @@ dialog { color: #07101f; }
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+
+  .live-indicator,
+  [data-clock-field="seconds"],
+  .clock-board.is-market-refreshing .clock-panel,
+  .clock-board.is-market-refreshing .primary-time,
+  .clock-board.is-market-refreshing .primary-time::before,
+  .clock-board.is-market-refreshing .primary-value-ghost {
+    animation: none !important;
+  }
+
+  .primary-value-ghost,
+  .primary-time::before {
+    opacity: 0 !important;
   }
 }

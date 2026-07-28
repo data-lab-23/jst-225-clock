@@ -35,6 +35,8 @@ export function createClockView(root: HTMLElement): ClockView {
     seconds: requiredField(root, "seconds"),
     zone: requiredField(root, "zone"),
   };
+  const timeGhost = root.querySelector<HTMLElement>(".primary-value-ghost");
+  if (!timeGhost) throw new Error("Missing required clock view hook: .primary-value-ghost");
   const status = requiredStatus(root);
 
   return {
@@ -42,7 +44,7 @@ export function createClockView(root: HTMLElement): ClockView {
       fields.titleJa.textContent = zone.titleJa;
       fields.titleEn.textContent = zone.titleEn;
       fields.time.textContent = snapshot.time;
-      fields.time.dataset.ghostValue = snapshot.time;
+      timeGhost.textContent = snapshot.time;
       fields.date.textContent = snapshot.date;
       fields.weekday.textContent = snapshot.weekday;
       fields.seconds.textContent = snapshot.seconds;

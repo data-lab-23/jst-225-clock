@@ -28,6 +28,7 @@ function createFixture(): HTMLElement {
     </header>
     <section>
       <span data-clock-field="time"></span>
+      <span class="primary-value-ghost" aria-hidden="true"></span>
       <span data-clock-field="date"></span>
       <span data-clock-field="weekday"></span>
       <span data-clock-field="seconds"></span>
@@ -56,7 +57,8 @@ describe("createClockView", () => {
     expect(field(root, "title-ja").textContent).toBe("日本標準時");
     expect(field(root, "title-en").textContent).toBe("Japan Standard Time 225");
     expect(field(root, "time").textContent).toBe("14:35");
-    expect(field(root, "time").dataset.ghostValue).toBe("14:35");
+    expect(root.querySelector(".primary-value-ghost")?.textContent).toBe("14:35");
+    expect(root.querySelector(".primary-value-ghost")?.getAttribute("aria-hidden")).toBe("true");
     expect(field(root, "date").textContent).toBe("2026.07.26");
     expect(field(root, "weekday").textContent).toBe("日曜日 / Sunday");
     expect(field(root, "seconds").textContent).toBe("42");
@@ -75,7 +77,7 @@ describe("createClockView", () => {
 
     expect(field(root, "time")).toBe(timeField);
     expect(field(root, "time").textContent).toBe("14:36");
-    expect(field(root, "time").dataset.ghostValue).toBe("14:36");
+    expect(root.querySelector(".primary-value-ghost")?.textContent).toBe("14:36");
     expect(field(root, "seconds").textContent).toBe("43");
     expect(field(root, "seconds").dataset.tickParity).toBe("odd");
     expect(root.querySelectorAll("[data-clock-field]")).toHaveLength(7);

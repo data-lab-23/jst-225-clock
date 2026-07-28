@@ -31,4 +31,16 @@ describe("clock board CSS contracts", () => {
     expect(styles).toMatch(/@media \(min-width: 761px\) and \(max-height: 820px\)[\s\S]*?\.clock-row\s*\{[\s\S]*?padding:/);
     expect(styles).toMatch(/@media \(min-width: 761px\) and \(max-height: 820px\)[\s\S]*?\.primary-value\s*\{[\s\S]*?font-size:/);
   });
+
+  it("provides truthful broadcast refresh decoration with a reduced-motion fallback", () => {
+    expect(rule(":root")).toMatch(/--font-broadcast-ja:/);
+    expect(rule(":root")).toMatch(/--font-broadcast-numeric:/);
+    expect(rule(".live-indicator")).toMatch(/animation:/);
+    expect(rule(".primary-value-ghost")).toMatch(/position:\s*absolute/);
+    expect(rule(".primary-value-ghost")).toMatch(/opacity:\s*0/);
+    expect(rule(".clock-board.is-market-refreshing .primary-time")).toMatch(/animation:/);
+    expect(styles).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.live-indicator[\s\S]*?animation:\s*none/,
+    );
+  });
 });

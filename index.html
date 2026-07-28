@@ -20,7 +20,10 @@
         <div class="clock-panel">
           <section class="primary-time" aria-labelledby="time-label">
             <p class="field-label" id="time-label"><span lang="ja">現在時刻</span><span lang="en">Current Time</span></p>
-            <span class="primary-value" data-clock-field="time">--:--</span>
+            <div class="primary-value-frame">
+              <span class="primary-value" data-clock-field="time">--:--</span>
+              <span class="primary-value-ghost" aria-hidden="true">--:--</span>
+            </div>
           </section>
 
           <dl class="clock-rows">

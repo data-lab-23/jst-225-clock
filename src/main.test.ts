@@ -39,6 +39,7 @@ function clockFixture(): HTMLElement {
     </header>
     <section class="clock-board">
       <span data-clock-field="time"></span>
+      <span class="primary-value-ghost" aria-hidden="true"></span>
       <span data-clock-field="date"></span>
       <span data-clock-field="weekday"></span>
       <span data-clock-field="seconds"></span>
