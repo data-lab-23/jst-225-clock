@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /jst-225-clock/
+
+Sitemap: https://data-lab-23.github.io/jst-225-clock/sitemap.xml
