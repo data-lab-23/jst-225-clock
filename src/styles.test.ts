@@ -27,7 +27,7 @@ describe("clock board CSS contracts", () => {
 
   it("compacts wide short viewports so the full board remains visible", () => {
     expect(styles).toMatch(
-      /@media \(max-height: 900px\)[\s\S]*?#app\s*\{[\s\S]*?padding-block:/,
+      /@media \(max-height: 900px\)[\s\S]*?\.clock-stage\s*\{[\s\S]*?padding-block:/,
     );
     expect(styles).toMatch(/@media \(min-width: 761px\) and \(max-height: 820px\)/);
     expect(styles).toMatch(/@media \(min-width: 761px\) and \(max-height: 820px\)[\s\S]*?\.clock-header\s*\{[\s\S]*?padding:/);
@@ -44,6 +44,20 @@ describe("clock board CSS contracts", () => {
     expect(rule(".clock-board.is-market-refreshing .primary-time")).toMatch(/animation:/);
     expect(styles).toMatch(
       /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.live-indicator[\s\S]*?animation:\s*none/,
+    );
+  });
+
+  it("keeps the clock first while presenting responsive search guidance below it", () => {
+    expect(rule("#app")).toMatch(/background:/);
+    expect(rule(".clock-stage")).toMatch(/min-height:\s*100dvh/);
+    expect(rule(".clock-stage")).toMatch(/place-items:\s*center/);
+    expect(rule(".clock-guide")).toMatch(/inline-size:\s*min\(100%,\s*72rem\)/);
+    expect(rule(".clock-guide")).toMatch(/content-visibility:\s*auto/);
+    expect(styles).toMatch(
+      /@media \(min-width: 761px\)[\s\S]*?\.clock-guide__grid\s*\{[\s\S]*?grid-template-columns:/,
+    );
+    expect(styles).toMatch(
+      /:fullscreen\s+\.clock-guide\s*\{[\s\S]*?display:\s*none/,
     );
   });
 });
