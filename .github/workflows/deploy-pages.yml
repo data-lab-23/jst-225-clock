@@ -39,6 +39,9 @@ jobs:
       - name: Build
         run: VITE_BASE_PATH=/${{ github.event.repository.name }}/ npm run build
 
+      - name: Verify deployment artifact
+        run: npm run verify:dist
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
