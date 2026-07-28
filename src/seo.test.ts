@@ -104,7 +104,7 @@ describe("crawler entry points", () => {
   });
 
   it("publishes an accessible advertising privacy policy", () => {
-    const privacyPath = resolve(process.cwd(), "privacy.html");
+    const privacyPath = resolve(process.cwd(), "public/privacy.html");
     expect(existsSync(privacyPath)).toBe(true);
 
     const privacyHtml = readFileSync(privacyPath, "utf8");
